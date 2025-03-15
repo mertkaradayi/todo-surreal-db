@@ -9,6 +9,7 @@ pub struct DatabaseConfig {
     pub password: String,
     pub namespace: String,
     pub dbname: String,
+    pub dburl: String,
 }
 
 impl DatabaseConfig {
@@ -20,6 +21,7 @@ impl DatabaseConfig {
             password: env::var("DB_PASSWORD").expect("DB_PASSWORD must be set"),
             namespace: env::var("DB_NAMESPACE").expect("DB_NAMESPACE must be set"),
             dbname: env::var("DB_DBNAME").expect("DB_DBNAME must be set"),
+            dburl: env::var("DB_URL").expect("DB_URL must be set"),
         }
     }
 }

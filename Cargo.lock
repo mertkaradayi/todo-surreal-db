@@ -3741,6 +3741,7 @@ dependencies = [
  "envconfig",
  "serde",
  "surrealdb",
+ "thiserror 1.0.69",
  "tokio",
 ]
 
