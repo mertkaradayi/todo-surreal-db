@@ -1,8 +1,8 @@
+use anyhow::{Context, Result};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::{Client, Ws};
 use surrealdb::opt::auth::Root;
 
-use super::error::{DatabaseError, DatabaseResult};
 use crate::config::Config;
 
 pub struct Database {
@@ -10,14 +10,14 @@ pub struct Database {
 }
 
 impl Database {
-    pub async fn new(config: &Config) -> DatabaseResult<Self> {
+    pub async fn new(config: &Config) -> Result<Self> {
         let client = Surreal::new::<Ws>(
             &config
                 .database
                 .dburl,
         )
         .await
-        .map_err(DatabaseError::ConnectionError)?;
+        .context("Failed to create database connection")?;
 
         // Authenticate using credentials
         client
@@ -30,7 +30,7 @@ impl Database {
                     .password,
             })
             .await
-            .map_err(DatabaseError::ConnectionError)?;
+            .context("Failed to authenticate with database")?;
 
         // Select namespace and database
         client
@@ -45,12 +45,12 @@ impl Database {
                     .dbname,
             )
             .await
-            .map_err(DatabaseError::ConnectionError)?;
+            .context("Failed to select namespace or database, or both")?;
 
         Ok(Self { client })
     }
 
-    pub async fn test_connection(&self) -> DatabaseResult<()> {
+    pub async fn test_connection(&self) -> Result<()> {
         let result = self
             .client
             .query(
@@ -58,10 +58,10 @@ impl Database {
                 RETURN 9; 
                 RETURN 10; 
                 SELECT * FROM { is: 'Nice database' };
-                ",
+            ",
             )
             .await
-            .map_err(DatabaseError::ConnectionError)?;
+            .context("Failed to execute test query")?;
 
         dbg!(result);
         Ok(())
@@ -72,4 +72,3 @@ impl Database {
     //     &self.client
     // }
 }
-

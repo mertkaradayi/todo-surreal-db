@@ -1,12 +1,12 @@
 mod config;
 mod database;
 
-use std::error::Error;
+use anyhow::Result;
 use config::Config;
 use database::Database;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> Result<()> {
     // Load the application configuration
     let config = Config::new();
 
@@ -14,7 +14,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let db = Database::new(&config).await?;
 
     // Test the connection
-    db.test_connection().await?;
+    db.test_connection()
+        .await?;
 
     Ok(())
 }
